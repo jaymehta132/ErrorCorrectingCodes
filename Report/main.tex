@@ -7,6 +7,9 @@
 \usepackage{algpseudocode}
 \usepackage{hyperref}
 \usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
+
 
 \newtheorem{claim}{Claim}
 
@@ -30,6 +33,7 @@
 
 Distributed learning helps address the challenges faced my large-scale machine learning tasks by outsourcing its computations to worker nodes. Such a system is susecptible to communication bottenecks caused by end-to-end delays between the workers and the central server. Another possible issue is the presence of stragglers (nodes that are slow to respond). In this scenario, the central server does not have enough data to compute the gradient to update its model parameters. One way to mitigate this is to split the dataset into $k$ smaller batches and assign $d$ batches to each of the $n$ workers. The $i$-th worker then sends a function $f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d})$ of the gradients to the central server, where $g_{i_j}$ is the gradient computed by the worker on the $j$-th batch assigned to it. The server is able to recover the full gradient even if some of the workers are stragglers, as long as it receives enough $h_i$'s. We shall now formally define the problem of gradient coding and then discuss a communication efficient scheme to solve it.
 
+% Introduction
 \section{Problem Statement}
 
 Consider a dataset $D = \{(x_i, y_i)\}_{i=1}^N$ where $x_i \in \mathbb{R}^l, y_i \in \mathbb{R}$. Our goal is to minimize the loss function $L(D; w) =  \sum_{i=1}^N L(w; x_i, y_i)$ where $w \in \mathbb{R}^d$ is the model parameter. One way to do this to perform:
@@ -44,5 +48,179 @@ Where $g^{(t)} = \sum_{i=1}^N \nabla L(w^{(t)}; x_i, y_i)$ and $h$ is some gradi
     g_i^{(t)} = \sum_{(x, y) \in D_i} \nabla L(w^{(t)}; x, y)
 \end{equation}
 
-Hence we see that $g^{(t)} = \sum_{i=1}^k g_i^{(t)}$. We assume that $s$ worker nodes are stragglers and hence we only have access to $n-s$ of the $g_i^{(t)}$'s. 
+Hence we see that $g^{(t)} = \sum_{i=1}^k g_i^{(t)}$. We assume that $s$ worker nodes are stragglers and hence we only have access to $n-s$ of the $g_i^{(t)}$'s. Say for each$i \in 1, 2, \ldots n$ we represent the datasets assigned to $W_i$ as $\{D_{i_1}, D_{i_2}, \ldots, D_{i_d}\}$. The $i$-th worker then sends a function $f_i(g_{i_1}^{(t)}, g_{i_2}^{(t)}, \ldots, g_{i_d}^{(t)})$ of the partial gradients. This paper only considers linear functions of the form: 
+
+\begin{equation}
+    f_i(g_{i_1}^{(t)}, g_{i_2}^{(t)}, \ldots, g_{i_d}^{(t)}) = \sum_{j=1}^d a_{i_j} g_{i_j}^{(t)}
+\end{equation}
+
+The partial gradient vector $g_i^{(t)} = [g_i^{(t)}(0), g_i^{(t)}(1), \ldots, g_i^{(t)}(l-1)]$ may require a large value of $l$ to be tolerant to stragglers or use a smaller $l$ but have less tolerance to stragglers. We shall drop the superscript $(t)$ for simplicity. 
+
+% Tolerance-Efficiency Tradeoff
+\section{Tolerance-Efficiency Tradeoff}
+
+Consider the scenario where $n=3, k=3$ we can have the following assignment of batches to workers:
+
+\begin{center}
+    \begin{tikzpicture}[
+    node distance=2.5cm and 2cm,
+    box/.style={draw, minimum width=1cm, minimum height=0.6cm, thick, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+
+    % Master Node (Center Bottom)
+    \node[box] (master) at (0,0) {Server};
+    
+    % Worker Nodes (Top Row)
+    \node[box, label=above:{$W_1$}] (w1) at (-3,2) {$D_1$};
+    \node[box, label=above:{$W_2$}] (w2) at (0,2) {$D_2$};
+    \node[box, label=above:{$W_3$}] (w3) at (3,2) {$D_3$};
+
+    % Paths and Arrows
+    \draw[arrow] (w1.south) -- (-3,0) -- (master.west);
+    \draw[arrow] (w2.south) -- (master.north);
+    \draw[arrow] (w3.south) -- (3,0) -- (master.east);
+
+    % Vector labels (fixed positions)
+    \node at (-4,1) {$\begin{bmatrix} g_1(0) \\ g_1(1) \end{bmatrix}$};
+    \node at (-1,1) {$\begin{bmatrix} g_2(0) \\ g_2(1) \end{bmatrix}$};
+    \node at (2,1) {$\begin{bmatrix} g_3(0) \\ g_3(1) \end{bmatrix}$};
+
+    % Result Vector (Bottom)
+    \node[below=0.2cm of master] {
+        $\begin{bmatrix} 
+        g_1(0) + g_2(0) + g_3(0) \\ 
+        g_1(1) + g_2(1) + g_3(1) 
+        \end{bmatrix}$
+    };
+
+\end{tikzpicture}
+\end{center}
+
+This is a basic scheme and the server needs to wait for all of the workers to respond before it can compute the full gradient. Such a scheme is neither communication efficient nor straggler tolerant. Now consider the following assignment of batches to workers:
+
+\begin{center}
+    \begin{tikzpicture}[
+    node distance=2.5cm and 2cm,
+    box/.style={draw, minimum width=1cm, minimum height=0.6cm, thick, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+
+    % Master Node (Center Bottom)
+    \node[box] (master) at (0,0) {Server};
+    
+    % Worker Nodes (Top Row)
+    \node[box] (w1) at (-4,2) {$D_1$};
+    \node[box, label=above:{$W_1$}] (w11) at (-4,2.6) {$D_2$};
+
+    \node[box] (w2) at (0,2) {$D_2$};
+    \node[box, label=above:{$W_2$}] (w22) at (0,2.6) {$D_3$};
+
+    \node[box] (w3) at (4,2) {$D_3$};
+    \node[box, label=above:{$W_3$}] (w33) at (4,2.6) {$D_1$};
+
+
+    % Paths and Arrows
+    \draw[arrow] (w1.south) -- (-4,0) -- (master.west);
+    \draw[arrow] (w2.south) -- (master.north);
+    \draw[arrow] (w3.south) -- (4,0) -- (master.east);
+
+    % Vector labels (fixed positions)
+    \node at (-6,1) {$\begin{bmatrix} g_1(0) + 2g_2(0) \\ g_1(1) + 2g_2(1) \end{bmatrix}$};
+    \node at (-1.5,1) {$\begin{bmatrix} g_2(0) - g_3(0) \\ g_2(1) - g_3(1) \end{bmatrix}$};
+    \node at (2.5,1) {$\begin{bmatrix} 2g_3(0) + g_1(0) \\ 2g_3(1) + g_1(1) \end{bmatrix}$};
+
+    % Result Vector (Bottom)
+    \node[below=0.2cm of master] {
+        $\begin{bmatrix} 
+        g_1(0) + g_2(0) + g_3(0) \\ 
+        g_1(1) + g_2(1) + g_3(1) 
+        \end{bmatrix}$
+    };
+
+\end{tikzpicture}
+\end{center}
+
+Here the server can compute the full gradient even if one of the workers is a straggler. If $W_1$ is a straggler, the server can compute the full gradient as $g = f_1 - f_2$, if $W_2$ is a straggler, the server can compute the full gradient as $g = f_2 + f_3$ and if $W_3$ is a straggler, the server can compute the full gradient as $g = \frac{1}{2}(f_3 + f_1)$. However, this scheme is not communication efficient as each worker sends a vector of size $l$. Consider:
+
+\begin{center}
+    \begin{tikzpicture}[
+    node distance=2.5cm and 2cm,
+    box/.style={draw, minimum width=1cm, minimum height=0.6cm, thick, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+
+    % Master Node (Center Bottom)
+    \node[box] (master) at (0,0) {Server};
+    
+    % Worker Nodes (Top Row)
+    \node[box] (w1) at (-4,2) {$D_1$};
+    \node[box, label=above:{$W_1$}] (w11) at (-4,2.6) {$D_2$};
+
+    \node[box] (w2) at (0,2) {$D_2$};
+    \node[box, label=above:{$W_2$}] (w22) at (0,2.6) {$D_3$};
+
+    \node[box] (w3) at (4,2) {$D_3$};
+    \node[box, label=above:{$W_3$}] (w33) at (4,2.6) {$D_1$};
+
+
+    % Paths and Arrows
+    \draw[arrow] (w1.south) -- (-4,0) -- (master.west);
+    \draw[arrow] (w2.south) -- (master.north);
+    \draw[arrow] (w3.south) -- (4,0) -- (master.east);
+
+    % Vector labels (fixed positions)
+    \node at (-6,1) {$\begin{bmatrix} g_1(0) + g_2(0) - g_2(1) \end{bmatrix}$};
+    \node at (-1.5,1) {$\begin{bmatrix} g_2(1) + g_3(0) \end{bmatrix}$};
+    \node at (2.25,1) {$\begin{bmatrix} g_1(1) + g_3(1) - g_3(0) \end{bmatrix}$};
+
+    % Result Vector (Bottom)
+    \node[below=0.2cm of master] {
+        $\begin{bmatrix} 
+        g_1(0) + g_2(0) + g_3(0) \\ 
+        g_1(1) + g_2(1) + g_3(1) 
+        \end{bmatrix}$
+    };
+
+\end{tikzpicture}
+\end{center}
+
+In this case $l = 1$ and the server computes the full gradient as $g(0) = f_1 + f_2$ and $g(1) = f_2 + f_3$. However, this scheme is not straggler tolerant as the server needs to wait for all the workers to respond before it can compute the full gradient. Hence we see that there is a tradeoff between straggler tolerance and communication efficiency. We shall now proceed with the main result presented by the paper and then discuss the scheme that achieves it.
+
+\chapter{Main Theorem}
+
+\section{Main Result}
+
+\begin{theorem}
+    Given integers $n, k$ a triple $(d, s, m)$ where $1 \leq d \leq k$ and $m \geq 1$ is achievable if there is a distributed synchronous gradient coding scheme with $n$ workers and $k$ data batches such that:
+
+    \begin{enumerate}
+        \item Each worker is assigned $d$ data batches
+        \item There are $n$ functions $f_i: \mathbb{R}^{dl} \to \mathbb{R}^{l/m}$ such that the server can recover the full gradient $g$ from any $n-s$ of the vectors $f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d})$ where $i_1, i_2, \ldots, i_d$ are the indices of the data batches assigned to worker $W_i$.
+        \item Each $f_i$ is a linear combination of the partial gradients $g_{i_1}, \ldots, g_{i_d}$
+    \end{enumerate}
+
+    \noindent 
+    and such a triple is achievable if and only if the following condition holds:
+
+    \begin{equation}
+        \frac{d}{k} \geq \frac{s+m}{n}
+    \end{equation}
+\end{theorem}
+
+We shall first show that any achievable $(d, s, m)$ must satisfy the above condition and then present the paper's coding scheme for $n = k$ that satisfies $d \geq s + m$ with equality.
+
+\section{Forward Direction}
+
+We assume that the triple $(d, s, m)$ is achievable and show that it must satisfy the condition $\frac{d}{k} \geq \frac{s+m}{n}$. Before wew proceed, we prove the following claim:
+\begin{claim}
+    For each $i \in [k]$, data batch $D_i$ is assigned to at least $s + m$ workers.
+\end{claim}
+
+\begin{proof}
+    Say for some $j \in [k]$ data batch $D_j$ is assigned to $a < s + m$ workers. WLOG assume these workers are $W_1, W_2, \ldots, W_a$ and suppose that first $s$ of these workers are stragglers. Based on our definition of achievability, the server should be able to recover the full gradient $g = g_1 + \ldots + g_k$ from the vectors $f_{s+1}, f_{s+2}, \ldots, f_n$.
+\end{proof}
+
+\section{Coding Scheme}
+
 \end{document}
