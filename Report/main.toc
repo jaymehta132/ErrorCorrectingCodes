@@ -1,7 +1,13 @@
 \contentsline {chapter}{\numberline {1}Introduction}{2}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Problem Statement}{2}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Tolerance-Efficiency Tradeoff}{3}{section.1.2}%
-\contentsline {chapter}{\numberline {2}Main Theorem}{5}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Main Result}{5}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Forward Direction}{5}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Coding Scheme}{6}{section.2.3}%
+\contentsline {chapter}{\numberline {2}Main Theorem}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Main Result}{4}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Forward Direction}{4}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Reverse Direction}{5}{section.2.3}%
+\contentsline {paragraph}{Layer Assignment.}{5}{section*.2}%
+\contentsline {paragraph}{Encoding Scheme.}{5}{section*.3}%
+\contentsline {paragraph}{Decoding and Straggler Resilience.}{5}{section*.4}%
+\contentsline {paragraph}{Reconstruction.}{6}{section*.5}%
+\contentsline {paragraph}{Conclusion.}{6}{section*.6}%
+\contentsline {section}{\numberline {2.4}Coding Scheme}{6}{section.2.4}%

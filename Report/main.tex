@@ -1,4 +1,5 @@
 \documentclass{report}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -6,6 +7,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue}
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta}
@@ -31,7 +33,7 @@
 
 \chapter{Introduction}
 
-Distributed learning helps address the challenges faced my large-scale machine learning tasks by outsourcing its computations to worker nodes. Such a system is susecptible to communication bottenecks caused by end-to-end delays between the workers and the central server. Another possible issue is the presence of stragglers (nodes that are slow to respond). In this scenario, the central server does not have enough data to compute the gradient to update its model parameters. One way to mitigate this is to split the dataset into $k$ smaller batches and assign $d$ batches to each of the $n$ workers. The $i$-th worker then sends a function $f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d})$ of the gradients to the central server, where $g_{i_j}$ is the gradient computed by the worker on the $j$-th batch assigned to it. The server is able to recover the full gradient even if some of the workers are stragglers, as long as it receives enough $h_i$'s. We shall now formally define the problem of gradient coding and then discuss a communication efficient scheme to solve it.
+Distributed learning helps address the challenges faced by large-scale machine learning tasks by outsourcing its computations to worker nodes. Such a system is susecptible to communication bottenecks caused by end-to-end delays between the workers and the central server. Another possible issue is the presence of stragglers (nodes that are slow to respond). In this scenario, the central server does not have enough data to compute the gradient to update its model parameters. One way to mitigate this is to split the dataset into $k$ smaller batches and assign $d$ batches to each of the $n$ workers. The $i$-th worker then sends a function $f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d})$ of the gradients to the central server, where $g_{i_j}$ is the gradient computed by the worker on the $j$-th batch assigned to it. The server is able to recover the full gradient even if some of the workers are stragglers, as long as it receives enough $h_i$'s. We shall now formally define the problem of gradient coding and then discuss a communication efficient scheme to solve it.
 
 % Introduction
 \section{Problem Statement}
@@ -230,6 +232,76 @@ We shall now uuse this to prove the forward direction of the main theorem.
 
 \begin{proof}
     From the claim we see that each data batch is assigned to atleast $s+m$ workers hence in total there must be atleast $k(s+m)$ data subsets assigned over all the workers. Since each of the $n$ workers is assigned $d$ data batches, there are a total of $nd$ data subsets assigned over all the workers. Hence we must have $nd \geq k(s+m)$ which implies that $\frac{d}{k} \geq \frac{s+m}{n}$.
+\end{proof}
+
+% \newpage
+
+% \section{Reverse Direction}
+
+% To prove the reverse direction, we construct a coding scheme for $n=k$ such that $d = s+m$ is achievable.
+
+% \begin{proof}[Proof of Theorem (Reverse Direction)]
+%     We partition each gradient $g_j$ into $m$ disjoint sub-vectors $g_j^{(1)}, \ldots, g_j^{(m)}$ of size $l/m$. The total gradient is $g = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}$. We define the workers' output $f_i$ as a collection of $m$ sub-packets, but to satisfy the $l/m$ communication constraint, each worker $W_i$ will only send a linear combination of one specific "layer" of sub-gradients.
+    
+%     Specifically, we can use an $(n, n-d+m)$ MDS code. By the properties of MDS codes, any $n-s$ columns of the generator matrix allow recovery of the original data. By assigning batches in a cyclic manner and using MDS coefficients, we can ensure that any $n-s$ surviving workers provide a full-rank system to solve for all sub-gradients $g_j^{(p)}$, provided the redundancy $d$ is sufficient to cover $s$ stragglers and the $m$ required components.
+% \end{proof}
+
+\section{Reverse Direction}
+
+To prove the reverse direction, we construct a coding scheme for $n = k$ such that $d = s + m$ is achievable.
+
+\begin{proof}[Proof of Theorem (Reverse Direction)]
+We begin by partitioning each gradient vector $g_j \in \mathbb{R}^l$ into $m$ disjoint sub-vectors:
+\[
+g_j = \left( g_j^{(1)}, g_j^{(2)}, \ldots, g_j^{(m)} \right), \quad g_j^{(p)} \in \mathbb{R}^{l/m}.
+\]
+Thus, the total gradient can be written as
+\[
+g = \sum_{j=1}^n g_j = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}.
+\]
+
+\paragraph{Layer Assignment.}
+We assign each worker $W_i$ to exactly one layer via a mapping
+\[
+p(i) \in \{1,2,\dots,m\},
+\]
+chosen such that each layer is assigned to at least $\left\lfloor \frac{n}{m} \right\rfloor$ workers. This ensures balanced coverage across layers.
+
+\paragraph{Encoding Scheme.}
+Let $G \in \mathbb{R}^{n \times (n - d + m)}$ be the generator matrix of an $(n, n - d + m)$ MDS code. For each layer $p$, we use the same generator matrix to encode the sub-gradients $\{g_j^{(p)}\}_{j=1}^n$.
+
+\noindent Each worker $W_i$, assigned to layer $p(i)$, stores a subset $\mathcal{S}_i \subseteq \{1,\dots,n\}$ of size $d$, and transmits:
+\[
+f_i = \sum_{j \in \mathcal{S}_i} G_{i,j} \, g_j^{(p(i))}.
+\]
+Since each worker only transmits a linear combination of sub-gradients from a single layer, the communication cost is $\frac{l}{m}$, satisfying the constraint.
+
+\paragraph{Decoding and Straggler Resilience.}
+Suppose up to $s$ workers are stragglers. Then at least $n - s$ workers successfully return their outputs. For any fixed layer $p$, consider the subset of non-straggling workers assigned to that layer.
+
+\noindent Since each worker participates in $d = s + m$ tasks and each layer is replicated across multiple workers, the number of available equations for each layer $p$ is at least:
+\[
+(n - s) - (m - 1) = n - s - m + 1 = n - d + 1.
+\]
+
+\noindent By construction, the generator matrix $G$ corresponds to an MDS code of dimension $(n - d + m)$. Hence, any $(n - d + m)$ rows of $G$ are linearly independent. Since
+\[
+n - d + 1 \geq n - d + m \quad \text{(as $m \geq 1$)},
+\]
+we obtain a sufficient number of independent equations to recover all sub-gradients $\{g_j^{(p)}\}_{j=1}^n$ for each layer $p$.
+
+\paragraph{Reconstruction.}
+Once all sub-gradients are recovered for every layer $p = 1,\dots,m$, the full gradient is reconstructed as:
+\[
+g = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}.
+\]
+
+\paragraph{Conclusion.}
+Thus, the scheme tolerates any $s$ stragglers while respecting the communication constraint of $\frac{l}{m}$ per worker. Therefore, redundancy
+\[
+d = s + m
+\]
+is sufficient, completing the proof. 
 \end{proof}
 
 \section{Coding Scheme}
