@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1777996890.55805 "c:/Users/Tanay/Documents/EE605/ErrorCorrectingCodes/Report/main.tex" "main.pdf" "main" 1777996893.17264 0
+["pdflatex"] 1778004193.33734 "c:/Users/Tanay/Documents/EE605/ErrorCorrectingCodes/Report/main.tex" "main.pdf" "main" 1778004195.17141 0
   "C:/Users/Tanay/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1774814378 242387 4cd0ba8baf7ab682b434fc7c9e928fa7 ""
   "C:/Users/Tanay/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1716798135 24240354 14f0a6c692a9fb30a8611f74f39d66ab ""
   "C:/Users/Tanay/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
@@ -170,11 +170,11 @@
   "C:/Users/Tanay/AppData/Local/Programs/MiKTeX/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1657800696 9714 ba3194bd52c8499b3f1e3eb91d409670 ""
   "C:/Users/Tanay/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/Tanay/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "c:/Users/Tanay/Documents/EE605/ErrorCorrectingCodes/Report/main.tex" 1777996889 10632 bc44c02e67468d7732f7501cf8bea7fe ""
-  "main.aux" 1777996892 1124 2933bf744dce4b0e81992cc998bb2b56 "pdflatex"
-  "main.out" 1777996892 929 4023bcb3267fc0093482a31e39975205 "pdflatex"
-  "main.tex" 1777996889 10632 bc44c02e67468d7732f7501cf8bea7fe ""
-  "main.toc" 1777996892 523 ef68341c5cf6bdc012e19952619d600b "pdflatex"
+  "c:/Users/Tanay/Documents/EE605/ErrorCorrectingCodes/Report/main.tex" 1778004191 12593 ad28daec072b3ec5809d282db46ba476 ""
+  "main.aux" 1778004194 1124 2933bf744dce4b0e81992cc998bb2b56 "pdflatex"
+  "main.out" 1778004194 929 4023bcb3267fc0093482a31e39975205 "pdflatex"
+  "main.tex" 1778004191 12593 ad28daec072b3ec5809d282db46ba476 ""
+  "main.toc" 1778004194 523 ef68341c5cf6bdc012e19952619d600b "pdflatex"
   (generated)
   "main.aux"
   "main.log"

@@ -54,7 +54,7 @@ Hence we see that $g^{(t)} = \sum_{i=1}^k g_i^{(t)}$. We assume that $s$ worker 
     f_i(g_{i_1}^{(t)}, g_{i_2}^{(t)}, \ldots, g_{i_d}^{(t)}) = \sum_{j=1}^d a_{i_j} g_{i_j}^{(t)}
 \end{equation}
 
-The partial gradient vector $g_i^{(t)} = [g_i^{(t)}(0), g_i^{(t)}(1), \ldots, g_i^{(t)}(l-1)]$ may require a large value of $l$ to be tolerant to stragglers or use a smaller $l$ but have less tolerance to stragglers. We shall drop the superscript $(t)$ for simplicity. 
+The partial gradient vector $g_i^{(t)} = [g_i^{(t)}(0), g_i^{(t)}(1), \ldots, g_i^{(t)}(l-1)]$. We can further generalize $f_i$ to be a linear combination of the coordinates of the partial gradients. This may require a large value of $l$ to be tolerant to stragglers or use a smaller $l$ but have less tolerance to stragglers. We shall drop the superscript $(t)$ for simplicity. 
 
 % Tolerance-Efficiency Tradeoff
 \section{Tolerance-Efficiency Tradeoff}
@@ -197,7 +197,7 @@ In this case $l = 1$ and the server computes the full gradient as $g(0) = f_1 + 
     \begin{enumerate}
         \item Each worker is assigned $d$ data batches
         \item There are $n$ functions $f_i: \mathbb{R}^{dl} \to \mathbb{R}^{l/m}$ such that the server can recover the full gradient $g$ from any $n-s$ of the vectors $f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d})$ where $i_1, i_2, \ldots, i_d$ are the indices of the data batches assigned to worker $W_i$.
-        \item Each $f_i$ is a linear combination of the partial gradients $g_{i_1}, \ldots, g_{i_d}$
+        \item Each $f_i$ is a linear combination of the coordinates of the partial gradients $g_{i_1}, \ldots, g_{i_d}$
     \end{enumerate}
 
     \noindent 
@@ -219,6 +219,17 @@ We assume that the triple $(d, s, m)$ is achievable and show that it must satisf
 
 \begin{proof}
     Say for some $j \in [k]$ data batch $D_j$ is assigned to $a < s + m$ workers. WLOG assume these workers are $W_1, W_2, \ldots, W_a$ and suppose that first $s$ of these workers are stragglers. Based on our definition of achievability, the server should be able to recover the full gradient $g = g_1 + \ldots + g_k$ from the vectors $f_{s+1}, f_{s+2}, \ldots, f_n$.
+    
+    As we can clearly calculate $g_j$ using the vectors $\{ g_i : i \in [k] \setminus \{j\} \} \cup \{g_1 + \ldots + g_k\}$, we can see that $g_j$ can be obtained using the vectors $\{ g_i : i \in [k] \setminus \{j\} \} \cup \{f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d}) : s+1 \leq i \leq n\}$. Note that $D_j$ is only assigned to the first $a$ workers and $\{f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d}) : a+1 \leq i \leq n\}$ can be otained using values in the set $\{ g_i : i \in [k] \setminus \{j\} \}$. Hence $g_j$ can be obtained using only the vectors $\{ g_i : i \in [k] \setminus \{j\} \} \cup \{f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d}) : s+1 \leq i \leq a\}$. 
+
+    Note that all $f_i$'s are linear functions of coordinates of the partial gradients and using the fact that $g_j$ is an $l$-dimensional vector, we see that the set $\{f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d}) : s+1 \leq i \leq a\}$ must contain atleast $l$ linear combinations of the coordinates of $g_j$. Since $\{f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d}) : s+1 \leq i \leq a\}$ contains elements that are $l/m$-dimensional, we see that we can have atmost $
+    \frac{l}{m}(a-s)$ linear combinations of the coordinates of $g_j$. Hence we must have $\frac{l}{m}(a-s) \geq l$ which implies that $a \geq s + m$. This is a contradicton and hence the claim is proved.
+\end{proof}
+
+We shall now uuse this to prove the forward direction of the main theorem.
+
+\begin{proof}
+    From the claim we see that each data batch is assigned to atleast $s+m$ workers hence in total there must be atleast $k(s+m)$ data subsets assigned over all the workers. Since each of the $n$ workers is assigned $d$ data batches, there are a total of $nd$ data subsets assigned over all the workers. Hence we must have $nd \geq k(s+m)$ which implies that $\frac{d}{k} \geq \frac{s+m}{n}$.
 \end{proof}
 
 \section{Coding Scheme}
