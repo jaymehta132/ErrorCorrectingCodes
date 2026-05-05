@@ -1,0 +1,48 @@
+\documentclass{report}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\newtheorem{claim}{Claim}
+
+\title{Communication Efficient Gradient Coding: A Survey}
+\author{Jay Mehta: 22B1281\\
+        Kshitij Vaidya: 22B1829\\
+        Tanay Bhat: 22B3303}
+\date{\today}  
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\renewcommand\qedsymbol{$\blacksquare$}
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+
+Distributed learning helps address the challenges faced my large-scale machine learning tasks by outsourcing its computations to worker nodes. Such a system is susecptible to communication bottenecks caused by end-to-end delays between the workers and the central server. Another possible issue is the presence of stragglers (nodes that are slow to respond). In this scenario, the central server does not have enough data to compute the gradient to update its model parameters. One way to mitigate this is to split the dataset into $k$ smaller batches and assign $d$ batches to each of the $n$ workers. The $i$-th worker then sends a function $f_i(g_{i_1}, g_{i_2}, \ldots, g_{i_d})$ of the gradients to the central server, where $g_{i_j}$ is the gradient computed by the worker on the $j$-th batch assigned to it. The server is able to recover the full gradient even if some of the workers are stragglers, as long as it receives enough $h_i$'s. We shall now formally define the problem of gradient coding and then discuss a communication efficient scheme to solve it.
+
+\section{Problem Statement}
+
+Consider a dataset $D = \{(x_i, y_i)\}_{i=1}^N$ where $x_i \in \mathbb{R}^l, y_i \in \mathbb{R}$. Our goal is to minimize the loss function $L(D; w) =  \sum_{i=1}^N L(w; x_i, y_i)$ where $w \in \mathbb{R}^d$ is the model parameter. One way to do this to perform:
+
+\begin{equation}
+    w^{(t+1)} = h(w^{(t)}, g^{(t)})
+\end{equation}
+
+Where $g^{(t)} = \sum_{i=1}^N \nabla L(w^{(t)}; x_i, y_i)$ and $h$ is some gradient based update. In a distributed setting, we assume $n$ workers $W_1, W_2, \ldots, W_n$ and split the dataaset $D$ into $k$ equal batches $D_1, D_2, \ldots, D_k$. Each worker is assigned $d$ batches and computes the following:
+
+\begin{equation}
+    g_i^{(t)} = \sum_{(x, y) \in D_i} \nabla L(w^{(t)}; x, y)
+\end{equation}
+
+Hence we see that $g^{(t)} = \sum_{i=1}^k g_i^{(t)}$. We assume that $s$ worker nodes are stragglers and hence we only have access to $n-s$ of the $g_i^{(t)}$'s. 
+\end{document}
