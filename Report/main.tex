@@ -14,6 +14,10 @@
 
 
 \newtheorem{claim}{Claim}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{procedure}[definition]{Procedure}
 
 \title{Communication Efficient Gradient Coding: A Survey}
 \author{Jay Mehta: 22B1281\\
@@ -469,5 +473,104 @@ To prove the reverse direction, we construct a coding scheme for $n = k$ such th
 % \end{proof}
 
 \section{Coding Scheme}
+
+Practical implementation requires careful handling of polynomial operations and matrix inversion.
+
+\subsection{Computing Matrix $B$ Efficiently}
+
+Algorithm 1 (from the original paper) provides an efficient recursive algorithm to compute the entries of $B$:
+
+\begin{algorithm}[H]
+\caption{Efficient Computation of Matrix $B$}
+\label{alg:compute_B}
+\begin{algorithmic}[1]
+\Require{Polynomial coefficients $p_{i,j}$ for $i \in [n], j \in \{0, 1, \ldots, n-d\}$}
+\Ensure{The $(mn) \times (n-s)$ matrix $B$}
+
+\State Initialize $B$ as a zero matrix of size $(mn) \times (n-s)$
+
+\For{$i = 1$ to $n$}
+    \For{$j = 1$ to $n-d+1$}
+        \State $b_{(i-1)m+1,j} \gets p_{i,j-1}$
+    \EndFor
+\EndFor
+
+\For{$u = 2$ to $m$}
+    \For{$i = 1$ to $n$}
+        \For{$j = 2$ to $n-d+u$}
+            \State $b_{(i-1)m+u,j} \gets b_{(i-1)m+u-1,j-1}$
+        \EndFor
+        
+        \For{$j = 1$ to $n-d+1$}
+            \State $b_{(i-1)m+u,j} \gets b_{(i-1)m+u,j} - b_{(i-1)m+u,n-d+1} \cdot b_{(i-1)m+1,j}$
+        \EndFor
+    \EndFor
+\EndFor
+
+\Return{$B$}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{remark}[Algorithm Complexity]
+Algorithm 1 computes all $mn(n-s)$ entries of $B$ in $O(mn(n-d))$ operations. For each $(u, i)$ pair, we perform $O(n)$ operations. Since there are $mn$ pairs, total complexity is $O(mn^2)$.
+\end{remark}
+
+\subsection{Computing Polynomial Coefficients}
+
+Before running Algorithm 1, we need to compute the base polynomial coefficients $p_{i,j}$ for all $i, j$.
+
+\begin{procedure}[Computing $p_{i,j}$]
+
+For each $i \in [n]$:
+
+\begin{enumerate}
+    \item Compute the roots: $\theta_{i \oplus 1}, \theta_{i \oplus 2}, \ldots, \theta_{i \oplus (n-d)}$
+    
+    \item Multiply out the polynomial:
+    \begin{equation}
+    p_i(x) = \prod_{k=1}^{n-d} (x - \theta_{i \oplus k})
+    \end{equation}
+    
+    \item Extract coefficients: $p_{i,0}, p_{i,1}, \ldots, p_{i,n-d}$
+\end{enumerate}
+
+Each polynomial multiplication can be done in $O(n^2)$ time using FFT or direct multiplication. For all $n$ polynomials, total time is $O(n^3)$ or $O(n^2 \log n)$ with FFT.
+
+\end{procedure}
+
+\subsection{Vandermonde Matrix Inversion}
+
+Computing $A^{-1}$ can be done using specialized algorithms for Vandermonde matrices:
+
+\begin{remark}[Vandermonde Inversion Complexity]
+Standard approaches:
+\begin{itemize}
+    \item Naive Gaussian elimination: $O((n-s)^3)$ flops
+    \item Specialized Vandermonde algorithms: $O((n-s)^2)$ flops
+\end{itemize}
+
+\noindent For typical values (e.g., $n-s \approx 10-20$), even naive inversion is fast.
+\end{remark}
+
+\subsection{Choice of Evaluation Points}
+The choice of evaluation points $\theta_1, \ldots, \theta_n$ affects both correctness and numerical stability.
+
+\paragraph{Requirements}
+
+\begin{itemize}
+    \item \textbf{Correctness}: All $\theta_i$ must be distinct
+    \item \textbf{Numerical Stability}: The Vandermonde matrix should be well-conditioned
+\end{itemize}
+
+\paragraph{Recommended Choice}
+
+\noindent The original paper recommends:
+
+\begin{equation}
+\{\theta_1, \theta_2, \ldots, \theta_n\} = \begin{cases}
+\{\pm(1 + i/2) : i = 0, 1, \ldots, n/2 - 1\} & \text{if } n \text{ is even} \\
+\{0, \pm(1 + i/2) : i = 0, 1, \ldots, (n-1)/2 - 1\} & \text{if } n \text{ is odd}
+\end{cases}
+\end{equation}
 
 \end{document}
