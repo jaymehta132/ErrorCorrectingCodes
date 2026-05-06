@@ -213,7 +213,7 @@ def tandon_best_runtime(n, lam1=0.8, lam2=0.1, t1=1.6, t2=6.0, n_trials=20_000):
 
 
 # ═══════════════════════════════════════════════════════════════
-# 3.  COMPUTE ALL DATA  (once, reused by individual + combined)
+# 3.  COMPUTE ALL DATA 
 # ═══════════════════════════════════════════════════════════════
 
 def compute_all_data(lam1=0.8, lam2=0.1, t1=1.6, t2=6.0, N_TRIALS=15_000):
@@ -528,7 +528,7 @@ def save_individual(data, out_dir=""):
 
 
 # ═══════════════════════════════════════════════════════════════
-# 6.  COMBINED FIGURE  (original layout)
+# 6.  COMBINED FIGURE
 # ═══════════════════════════════════════════════════════════════
 
 def make_combined(data):
