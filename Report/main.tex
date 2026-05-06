@@ -421,7 +421,7 @@ To prove the reverse direction, we construct a coding scheme for $n = k$ such th
     \end{itemize}
 
     \paragraph{Decoding at Master Node}
-    \textbf{Setup:} Without loss of generality, assume the non-straggling workers are $\{1, 2, \ldots, n-s\}$. Define the $(n-s) \times (n-s)$ Vandermonde matrix:
+     Without loss of generality, assume the non-straggling workers are $\{1, 2, \ldots, n-s\}$. Define the $(n-s) \times (n-s)$ Vandermonde matrix:
 
     \begin{equation}
     A := 
@@ -446,17 +446,17 @@ To prove the reverse direction, we construct a coding scheme for $n = k$ such th
     z_v B e_{n-d+u} = z_v B A A^{-1} e_{n-d+u}.
     \end{equation}
 
-    By the block diagonal structure of $B$ (equation 15), we have:
+    \noindent By the block diagonal structure of $B$ (equation 15), we have:
     \begin{equation}
     z_v B e_{n-d+u} = \sum_{j=1}^{n} g_j(vm + u - 1) \quad \text{for all } v \in \{0, 1, \ldots, l/m-1\}, u \in [m].
     \end{equation}
 
-    Combining over all $v$ and $u$:
+    \noindent Combining over all $v$ and $u$:
     \begin{equation}
     \left\{ z_v B e_{n-d+u} : v \in \{0, \ldots, l/m-1\}, u \in [m] \right\} = \left\{ \sum_{j=1}^n g_j(i) : i \in \{0, 1, \ldots, l-1\} \right\} = g^{(1)} + g^{(2)} + \cdots + g^{(n)}.
     \end{equation}
 
-    Thus, the full gradient vector is recovered.
+    \noindent Thus, the full gradient vector is recovered. We have shown that the coding scheme satisfies all required conditions, completing the achievability proof.
 
 \end{proof}
 

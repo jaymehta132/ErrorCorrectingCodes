@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1778054781 "/Users/kshitijvaidya/Semester8/ErrorCorrectingCodes/ErrorCorrectingCodes/Report/main.tex" "main.pdf" "main" 1778054783 0
-  "/Users/kshitijvaidya/Semester8/ErrorCorrectingCodes/ErrorCorrectingCodes/Report/main.tex" 1778054780 24703 fd8768a3d1c9b6419dd4263a99f5473b ""
+["pdflatex"] 1778054935 "/Users/kshitijvaidya/Semester8/ErrorCorrectingCodes/ErrorCorrectingCodes/Report/main.tex" "main.pdf" "main" 1778054936 0
+  "/Users/kshitijvaidya/Semester8/ErrorCorrectingCodes/ErrorCorrectingCodes/Report/main.tex" 1778054934 24826 3cbaac173610d25b16b5dcb98f7cb52e ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -181,10 +181,10 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1692767575 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1692767510 7883452 056548efc945bebff244f86cabed9df9 ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "main.aux" 1778054782 2392 79079433b5fa114c674ea0afc5edfdd1 "pdflatex"
-  "main.out" 1778054782 1071 56b0a0eac520a1a12dcd39d6bd0e6bb7 "pdflatex"
-  "main.tex" 1778054780 24703 fd8768a3d1c9b6419dd4263a99f5473b ""
-  "main.toc" 1778054782 1071 32592b9d98da3bf105d2b36e7aca23cb "pdflatex"
+  "main.aux" 1778054936 2392 79079433b5fa114c674ea0afc5edfdd1 "pdflatex"
+  "main.out" 1778054936 1071 56b0a0eac520a1a12dcd39d6bd0e6bb7 "pdflatex"
+  "main.tex" 1778054934 24826 3cbaac173610d25b16b5dcb98f7cb52e ""
+  "main.toc" 1778054936 1071 32592b9d98da3bf105d2b36e7aca23cb "pdflatex"
   (generated)
   "main.aux"
   "main.log"
