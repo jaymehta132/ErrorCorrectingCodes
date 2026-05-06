@@ -1,0 +1,62 @@
+\documentclass{report}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
+
+
+\newtheorem{claim}{Claim}
+
+\title{Communication Efficient Gradient Coding: A Survey}
+\author{Jay Mehta: 22B1281\\
+        Kshitij Vaidya: 22B1829\\
+        Tanay Bhat: 22B3303}
+\date{\today}  
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\renewcommand\qedsymbol{$\blacksquare$}
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\chapter{Implementation}
+In this chapter, we will discuss our own implementation of a toy example of a gradient coding scheme. We will implement a simple gradient coding scheme based on the idea of polynomial interpolation as described in the reference paper. We will use Python for our implementation.
+\section{Setup}
+We have made an assumption in our implementation.
+\begin{equation*}
+    \text{n (Number of workers)} = \text{k (Number of datasets)}
+\end{equation*}
+This is consistent with the reference paper, which also makes a similar assumption for simplicity. 
+
+We test the correctness of our implementation by trying out multiple test cases mentioned below:
+\begin{table}[!h]
+    \centering
+\begin{tabular}{c|c|c|c|c|c}
+\hline
+\textbf{Test Case} & \textbf{n = k} & \textbf{d} & \textbf{s} & \textbf{m} & \textbf{l} \\ \hline
+1 & 5 & 3 & 1 & 2 & 4 \\
+2 & 6 & 3 & 1 & 2 & 6 \\
+3 & 8 & 4 & 2 & 2 & 8 \\
+4 & 10 & 5 & 3 & 2 & 20 \\
+5 & 10 & 4 & 2 & 2 & 20 \\
+6 & 10 & 3 & 1 & 2 & 20 \\
+7 & 12 & 6 & 3 & 3 & 12 \\
+8 & 15 & 5 & 2 & 3 & 15 \\ 
+\hline
+\end{tabular}
+\caption{Test cases for our implementation}
+\end{table}
+
+n = number of workers, k = number of datasets, d = number of datasets assigned to each worker, s = number of stragglers tolerated, m = communication reduction factor, l = dimension of the gradient vector.
+\end{document}

@@ -1,13 +1,6 @@
 """
 Communication-Computation Efficient Gradient Coding
 Ye & Abbe, ICML 2018
-
-Fixed implementation:
-  - Removes k = n assumption (general k; scheme uses n=k internally per paper)
-  - Removes l/m = 1 assumption (arbitrary l multiple of m)
-  - Removes s = 1 assumption (arbitrary s satisfying d = s + m)
-  - Adds timing simulation with shifted-exponential RVs (Section 5 of paper)
-  - Adds gradient deviation analysis vs n, s, m
 """
 
 import numpy as np
@@ -465,7 +458,7 @@ def make_plots():
     # ────────────────────────────────────────────────────────────
     print("Gradient deviation vs s …")
     n_f, l_f = 10, 20
-    m_choices_s = [1, 2, 3]
+    m_choices_s = [1, 2, 4, 5]
     ax = ax_devm
 
     for m_v in m_choices_s:
@@ -484,7 +477,7 @@ def make_plots():
             except Exception:
                 errs_s.append(np.nan)
 
-        color = [C["naive"], C["tandon"], C["ours"]][m_choices_s.index(m_v)]
+        color = [C["naive"], C["tandon"], C["ours"], C["accent"]][m_choices_s.index(m_v)]
         ax.semilogy(s_range_s, errs_s, "o-", color=color, linewidth=1.8,
                     markersize=5, label=f"m={m_v}")
 
@@ -569,7 +562,7 @@ if __name__ == "__main__":
     for args in test_cases:
         n, d, s, m, l = args
         true_sum, recovered, err = run_demo(n, d, s, m, l)
-        status = "✓" if err < 1e-6 else f"✗  err={err:.2e}"
+        status = "✓" if err < 1e-9 else f"✗  err={err:.2e}"
         print(f"  n={n:2d} d={d} s={s} m={m} l={l:3d}  |  {status}")
 
     print("\nBuilding plots …")
