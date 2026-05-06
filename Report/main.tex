@@ -248,61 +248,225 @@ We shall now uuse this to prove the forward direction of the main theorem.
 
 \section{Reverse Direction}
 
-To prove the reverse direction, we construct a coding scheme for $n = k$ such that $d = s + m$ is achievable.
+To prove the reverse direction, we construct a coding scheme for $n = k$ such that $d = s + m$ is achievable with equality.
 
-\begin{proof}[Proof of Theorem (Reverse Direction)]
-We begin by partitioning each gradient vector $g_j \in \mathbb{R}^l$ into $m$ disjoint sub-vectors:
-\[
-g_j = \left( g_j^{(1)}, g_j^{(2)}, \ldots, g_j^{(m)} \right), \quad g_j^{(p)} \in \mathbb{R}^{l/m}.
-\]
-Thus, the total gradient can be written as
-\[
-g = \sum_{j=1}^n g_j = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}.
-\]
+% \begin{proof}[Proof of Theorem (Reverse Direction)]
+% We begin by partitioning each gradient vector $g_j \in \mathbb{R}^l$ into $m$ disjoint sub-vectors:
+% \[
+% g_j = \left( g_j^{(1)}, g_j^{(2)}, \ldots, g_j^{(m)} \right), \quad g_j^{(p)} \in \mathbb{R}^{l/m}.
+% \]
+% Thus, the total gradient can be written as
+% \[
+% g = \sum_{j=1}^n g_j = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}.
+% \]
 
-\paragraph{Layer Assignment.}
-We assign each worker $W_i$ to exactly one layer via a mapping
-\[
-p(i) \in \{1,2,\dots,m\},
-\]
-chosen such that each layer is assigned to at least $\left\lfloor \frac{n}{m} \right\rfloor$ workers. This ensures balanced coverage across layers.
+% \paragraph{Layer Assignment.}
+% We assign each worker $W_i$ to exactly one layer via a mapping
+% \[
+% p(i) \in \{1,2,\dots,m\},
+% \]
+% chosen such that each layer is assigned to at least $\left\lfloor \frac{n}{m} \right\rfloor$ workers. This ensures balanced coverage across layers.
 
-\paragraph{Encoding Scheme.}
-Let $G \in \mathbb{R}^{n \times (n - d + m)}$ be the generator matrix of an $(n, n - d + m)$ MDS code. For each layer $p$, we use the same generator matrix to encode the sub-gradients $\{g_j^{(p)}\}_{j=1}^n$.
+% \paragraph{Encoding Scheme.}
+% Let $G \in \mathbb{R}^{n \times (n - d + m)}$ be the generator matrix of an $(n, n - d + m)$ MDS code. For each layer $p$, we use the same generator matrix to encode the sub-gradients $\{g_j^{(p)}\}_{j=1}^n$.
 
-\noindent Each worker $W_i$, assigned to layer $p(i)$, stores a subset $\mathcal{S}_i \subseteq \{1,\dots,n\}$ of size $d$, and transmits:
-\[
-f_i = \sum_{j \in \mathcal{S}_i} G_{i,j} \, g_j^{(p(i))}.
-\]
-Since each worker only transmits a linear combination of sub-gradients from a single layer, the communication cost is $\frac{l}{m}$, satisfying the constraint.
+% \noindent Each worker $W_i$, assigned to layer $p(i)$, stores a subset $\mathcal{S}_i \subseteq \{1,\dots,n\}$ of size $d$, and transmits:
+% \[
+% f_i = \sum_{j \in \mathcal{S}_i} G_{i,j} \, g_j^{(p(i))}.
+% \]
+% Since each worker only transmits a linear combination of sub-gradients from a single layer, the communication cost is $\frac{l}{m}$, satisfying the constraint.
 
-\paragraph{Decoding and Straggler Resilience.}
-Suppose up to $s$ workers are stragglers. Then at least $n - s$ workers successfully return their outputs. For any fixed layer $p$, consider the subset of non-straggling workers assigned to that layer.
+% \paragraph{Decoding and Straggler Resilience.}
+% Suppose up to $s$ workers are stragglers. Then at least $n - s$ workers successfully return their outputs. For any fixed layer $p$, consider the subset of non-straggling workers assigned to that layer.
 
-\noindent Since each worker participates in $d = s + m$ tasks and each layer is replicated across multiple workers, the number of available equations for each layer $p$ is at least:
-\[
-(n - s) - (m - 1) = n - s - m + 1 = n - d + 1.
-\]
+% \noindent Since each worker participates in $d = s + m$ tasks and each layer is replicated across multiple workers, the number of available equations for each layer $p$ is at least:
+% \[
+% (n - s) - (m - 1) = n - s - m + 1 = n - d + 1.
+% \]
 
-\noindent By construction, the generator matrix $G$ corresponds to an MDS code of dimension $(n - d + m)$. Hence, any $(n - d + m)$ rows of $G$ are linearly independent. Since
-\[
-n - d + 1 \geq n - d + m \quad \text{(as $m \geq 1$)},
-\]
-we obtain a sufficient number of independent equations to recover all sub-gradients $\{g_j^{(p)}\}_{j=1}^n$ for each layer $p$.
+% \noindent By construction, the generator matrix $G$ corresponds to an MDS code of dimension $(n - d + m)$. Hence, any $(n - d + m)$ rows of $G$ are linearly independent. Since
+% \[
+% n - d + 1 \geq n - d + m \quad \text{(as $m \geq 1$)},
+% \]
+% we obtain a sufficient number of independent equations to recover all sub-gradients $\{g_j^{(p)}\}_{j=1}^n$ for each layer $p$.
 
-\paragraph{Reconstruction.}
-Once all sub-gradients are recovered for every layer $p = 1,\dots,m$, the full gradient is reconstructed as:
-\[
-g = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}.
-\]
+% \paragraph{Reconstruction.}
+% Once all sub-gradients are recovered for every layer $p = 1,\dots,m$, the full gradient is reconstructed as:
+% \[
+% g = \sum_{p=1}^m \sum_{j=1}^n g_j^{(p)}.
+% \]
 
-\paragraph{Conclusion.}
-Thus, the scheme tolerates any $s$ stragglers while respecting the communication constraint of $\frac{l}{m}$ per worker. Therefore, redundancy
-\[
-d = s + m
-\]
-is sufficient, completing the proof. 
+\begin{proof}
+    \noindent We construct an explicit coding scheme that achieves $d = s + m$ with equality in the following steps:
+    \begin{enumerate}
+        \item Define polynomials $p_i(x)$ that encode which data subsets are assigned to each worker.
+        \item Construct the encoding matrix $B$ recursively using polynomial coefficients.
+        \item Show that any $(n-s)$ workers can jointly recover the full gradient vector.
+    \end{enumerate}
+
+    \paragraph{Notation}
+    Let $\theta_1, \theta_2, \ldots, \theta_n$ be $n$ distinct real numbers (called ``evaluation points``). We will use these to construct polynomials and a Vandermonde-like matrix for decoding.
+
+    \noindent \textbf{Key parameters:}
+    \begin{itemize}
+        \item $n$: number of workers
+        \item $k = n$: number of data subsets (by assumption)
+        \item $d = s + m$: computation load per worker
+        \item $s$: number of stragglers tolerated
+        \item $m$: communication reduction factor
+        \item $l$: dimension of gradient vector (assumed divisible by $m$)
+    \end{itemize}
+
+    \paragraph{Polynomial Construction}
+    For each data subset $D_i$ (where $i \in [n]$), we define a polynomial $p_i(x)$ of degree $n - d$:
+
+    \begin{equation}
+        p_i(x) = \prod_{j=1}^{n-d} (x - \theta_{i \oplus j}),
+    \end{equation}
+
+    \noindent where $\oplus$ denotes cyclic addition modulo $n$, i.e., $a \oplus b = a + b \pmod{n}$.
+
+    \noindent The polynomial $p_i(x)$ encodes batch assignment:
+    \begin{itemize}
+        \item The roots of $p_i(x)$ are $\theta_{i \oplus 1}, \theta_{i \oplus 2}, \ldots, \theta_{i \oplus (n-d)}$.
+        \item Data subset $D_i$ is not assigned to workers $W_{i \oplus 1}, W_{i \oplus 2}, \ldots, W_{i \oplus (n-d)}$.
+        \item Therefore, $D_i$ is assigned to workers where $p_i(\theta_j) \neq 0$.
+        \item This gives exactly $d = s + m$ workers per batch (by cyclic symmetry).
+    \end{itemize}
+
+    \noindent Write $p_i(x)$ in standard form:
+    \begin{equation}
+        p_i(x) = \sum_{j=0}^{n-d} p_{i,j} x^j,
+    \end{equation}
+
+    \noindent where $p_{i,j}$ are the coefficients. We can see that $\deg(p_i) = n - d$ and the leading coefficient $p_{i, n-d} = 1$.
+
+    \paragraph{Recursive Polynomial Family}
+    To handle the communication reduction factor $m$, we define a family of $m$ polynomials for each data subset. For each $i \in [n]$, define:
+
+    \begin{equation}
+        \begin{aligned}
+            p_i^{(1)}(x) &:= p_i(x), \\
+            p_i^{(u)}(x) &:= x \cdot p_i^{(u-1)}(x) - p_{i, n-d-1}^{(u-1)} \cdot p_i^{(1)}(x), \quad u = 2, 3, \ldots, m.
+        \end{aligned}
+    \end{equation}
+
+    \noindent where $p_{i,j}^{(u)}$ denotes the coefficient of $x^j$ in $p_i^{(u)}(x)$. This recursive construction ensures:
+    \begin{itemize}
+        \item Each $p_i^{(u)}(x)$ has degree $n - d + u - 1$.
+        \item The leading coefficient is always $1$: $p_{i, n-d+u-1}^{(u)} = 1$.
+        \item The last $m$ coefficients align properly for reconstruction:
+        $$p_{i,j}^{(u)} = 0 \quad \text{for } j \in \{n-d, n-d+1, \ldots, n-d+u-2\} \text{ when } u \geq 2.$$
+        \item $p_i | p_i^{(u)}$ for all $u$, meaning:
+        $$p_i^{(u)}(\theta_{i \oplus 1}) = p_i^{(u)}(\theta_{i \oplus 2}) = \cdots = p_i^{(u)}(\theta_{i \oplus (n-d)}) = 0.$$
+    \end{itemize}
+
+    \paragraph{Construction of Encoding Matrix $B$} 
+    Define an $(mn) \times (n-s)$ matrix $B = (b_{ij})$ with entries:
+
+    \begin{equation}
+    b_{(i-1)m+u, j} = p_{i,j-1}^{(u)} \quad \text{for all } i \in [n], u \in [m], j \in \{1, 2, \ldots, n-s\}.
+    \end{equation}
+
+    \noindent The rows of $B$ are formed by stacking the coefficient vectors of the polynomials $p_1^{(1)}, \ldots, p_1^{(m)}, p_2^{(1)}, \ldots, p_n^{(m)}$ in order. For any $x \in \mathbb{R}$, the following matrix-vector product holds:
+    \begin{equation}
+    B \begin{bmatrix} 1 \\ x \\ x^2 \\ \vdots \\ x^{n-s-1} \end{bmatrix} = 
+    \begin{bmatrix} 
+    p_1^{(1)}(x) \\ p_1^{(2)}(x) \\ \vdots \\ p_1^{(m)}(x) \\ 
+    p_2^{(1)}(x) \\ \vdots \\ 
+    p_n^{(m)}(x) 
+    \end{bmatrix}.
+    \end{equation}
+
+    \noindent This directly follows from the polynomial representation and definition of $B$. The last columns of $B$ form a block diagonal matrix:
+    \begin{equation}
+    B_{[(n-d+1):(n-s)]} = \begin{bmatrix} I_m \\ I_m \\ \vdots \\ I_m \end{bmatrix},
+    \end{equation}
+    \noindent where $I_m$ is the $m \times m$ identity matrix, and there are $n$ blocks of $I_m$ (one for each worker). This property is crucial for recovery, it guarantees that any $(n-s) \times (n-s)$ submatrix of the Vandermonde matrix at columns corresponding to non-straggling workers will allow us to reconstruct the full gradient.
+
+    \paragraph{Gradient Vector Partitioning}
+    We partition the gradient vector to align with the communication reduction factor. For each $v \in \{0, 1, \ldots, l/m - 1\}$ and $j \in [n]$, define an $m$-dimensional sub-vector:
+
+    \begin{equation}
+    y_v^{(j)} := \begin{bmatrix} g_j(vm) \\ g_j(vm + 1) \\ \vdots \\ g_j(vm + m - 1) \end{bmatrix} \in \mathbb{R}^m.
+    \end{equation}
+
+    \noindent For each $v$, stack these into an $(mn)$-dimensional vector:
+    \begin{equation}
+    z_v := \begin{bmatrix} y_v^{(1)} \\ y_v^{(2)} \\ \vdots \\ y_v^{(n)} \end{bmatrix} \in \mathbb{R}^{mn}.
+    \end{equation}
+    This partitioning allows for:
+    \begin{enumerate}
+        \item Reducing transmission from dimension $l$ to dimension $l/m$ (communication reduction by factor $m$).
+        \item Applying the encoding matrix $B$ simultaneously to all $l/m$ blocks.
+        \item Reconstructing each block independently using the same Vandermonde inversion.
+    \end{enumerate}
+
+    \paragraph{Encoding at Workers}
+    For worker $W_i$, compute the transmitted vector:
+
+    \begin{equation}
+    f_i(g_i, g_{i \oplus 1}, \ldots, g_{i \oplus (d-1)}) := 
+    \begin{bmatrix} z_0 \\ z_1 \\ \vdots \\ z_{l/m-1} \end{bmatrix} B 
+    \begin{bmatrix} 1 \\ \theta_i \\ \theta_i^2 \\ \vdots \\ \theta_i^{n-s-1} \end{bmatrix}.
+    \end{equation}
+
+    \noindent This is an $(l/m)$-dimensional vector (reduced from dimension $l$). We have:
+    $$p_i^{(u)}(\theta_{i \oplus 1}) = p_i^{(u)}(\theta_{i \oplus 2}) = \cdots = p_i^{(u)}(\theta_{i \oplus (n-d)}) = 0.$$
+
+    Substituting into the encoding, the product $z_v B \begin{bmatrix} 1 & \theta_i & \cdots & \theta_i^{n-s-1} \end{bmatrix}^T$ depends only on:
+    \begin{itemize}
+        \item The sub-vectors $y_v^{(j)}$ for $j$ such that $p_j(\theta_i) \neq 0$, i.e., for $j \in \{i, i \oplus 1, \ldots, i \oplus (d-1)\}$.
+        \item Thus, worker $W_i$ only needs access to data subsets $D_i, D_{i \oplus 1}, \ldots, D_{i \oplus (d-1)}$.
+    \end{itemize}
+
+    \paragraph{Decoding at Master Node}
+    \textbf{Setup:} Without loss of generality, assume the non-straggling workers are $\{1, 2, \ldots, n-s\}$. Define the $(n-s) \times (n-s)$ Vandermonde matrix:
+
+    \begin{equation}
+    A := 
+    \begin{bmatrix}
+    1 & 1 & \cdots & 1 \\
+    \theta_1 & \theta_2 & \cdots & \theta_{n-s} \\
+    \theta_1^2 & \theta_2^2 & \cdots & \theta_{n-s}^2 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \theta_1^{n-s-1} & \theta_2^{n-s-1} & \cdots & \theta_{n-s}^{n-s-1}
+    \end{bmatrix}.
+    \end{equation}
+
+    \noindent This matrix is invertible (standard property of Vandermonde matrices with distinct evaluation points). From the received vectors $f_1, f_2, \ldots, f_{n-s}$, the master obtains:
+
+    \begin{equation}
+    z_v B A \quad \text{for all } v \in \{0, 1, \ldots, l/m - 1\}.
+    \end{equation}
+
+    \noindent To recover $z_v B e_{n-d+u}$ (which corresponds to the $u$-th component of the sum gradient at position $vm + u - 1$), multiply by $A^{-1} e_{n-d+u}$:
+
+    \begin{equation}
+    z_v B e_{n-d+u} = z_v B A A^{-1} e_{n-d+u}.
+    \end{equation}
+
+    By the block diagonal structure of $B$ (equation 15), we have:
+    \begin{equation}
+    z_v B e_{n-d+u} = \sum_{j=1}^{n} g_j(vm + u - 1) \quad \text{for all } v \in \{0, 1, \ldots, l/m-1\}, u \in [m].
+    \end{equation}
+
+    Combining over all $v$ and $u$:
+    \begin{equation}
+    \left\{ z_v B e_{n-d+u} : v \in \{0, \ldots, l/m-1\}, u \in [m] \right\} = \left\{ \sum_{j=1}^n g_j(i) : i \in \{0, 1, \ldots, l-1\} \right\} = g^{(1)} + g^{(2)} + \cdots + g^{(n)}.
+    \end{equation}
+
+    Thus, the full gradient vector is recovered.
+
 \end{proof}
+
+% \paragraph{Conclusion.}
+% Thus, the scheme tolerates any $s$ stragglers while respecting the communication constraint of $\frac{l}{m}$ per worker. Therefore, redundancy
+% \[
+% d = s + m
+% \]
+% is sufficient, completing the proof. 
+% \end{proof}
 
 \section{Coding Scheme}
 
